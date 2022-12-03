@@ -1,4 +1,4 @@
-# Python-Magic-Mirror
+# Python Magic Mirror
 A magic mirror built using PyQt6 as the GUI.
 
 This multithreaded program can be run on any device that can run Python. Therefore, old laptops or Raspberry Pis can be used to create the mirror.
