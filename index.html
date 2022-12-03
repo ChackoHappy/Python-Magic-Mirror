@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <style>
+    .grid-container {
+      display: grid;
+      grid-template-columns: auto auto auto;
+      padding: 10px;
+    }
+  </style>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Magic Mirror Control</title>
+  </head>
+  <body>
+    <form action="/send" method="post">
+			<input type="submit" name="command" value="EXIT"/>
+      <input type="submit" name="command" value="EXIT YOUTUBE MENU"/>
+      <input type="submit" name="command" value="EXIT YOUTUBE"/>
+      <br>
+      <br>
+      <input type="text" name="ytsearch">
+      <input type="submit" name="command" value="SEARCH"/>
+      <div class="grid-container">
+        <input type="submit" name="command" value="1"/>
+        <input type="submit" name="command" value="2"/>
+        <input type="submit" name="command" value="3"/>
+        <input type="submit" name="command" value="4"/>
+        <input type="submit" name="command" value="5"/>
+        <input type="submit" name="command" value="6"/>
+        <input type="submit" name="command" value="7"/>
+        <input type="submit" name="command" value="8"/>
+        <input type="submit" name="command" value="9"/>
+      </div>
+      <input type="submit" name="command" value="PLAY"/>
+      <input type="submit" name="command" value="PAUSE"/>
+		</form>
+  </body>
+</html>
