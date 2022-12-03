@@ -16,7 +16,7 @@ This multithreaded program can be run on any device that can run Python. Therefo
 - Updates every 5 seconds
 
 ### Current Weather Display
-- Powered by OpenWeatherMAP
+- Powered by OpenWeatherMap
 - Updates every hour
 
 ### Todoist Tasks Syncing
