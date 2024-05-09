@@ -14,13 +14,12 @@ import feedparser
 import speech_recognition as sr
 import vlc
 import pafy
-import random
-from urllib import request, parse
-from todoist_api_python.api import TodoistAPI
 import http.server
 import cgi
 from os import curdir, sep
 import socket
+
+#Add widget: https://www.biblegateway.com/votd/get/?format=json&version=kjv
 
 # Web Server Values
 HOST_NAME = ''
@@ -32,8 +31,8 @@ longitude = -94.740486
 location = "Longview"
 weatherAPIKey = "e8daae205d7d385ea3588d79781c9327"
 
-# Todoist API Value
-todoistAPIKey = "2ddd611f27c6905c7f6ea692b1caea5944f8c2f7"
+#Coin Market Cap API
+cryptoAPI = '9883a0ee-d826-4d44-8728-e2e117927dc5'
 
 # Queue that will contain the commands recieved by the web server and the voice recognition service
 # Queue is used for data sharing between processes
@@ -177,7 +176,7 @@ class Weather(QWidget):
 
     # Gets and sets the current weather data
     def getWeather(self):
-        print("LOG: getting weather")
+        print("API: getting weather")
 
         # Get data from API URL
         OWMAPIURL = "https://api.openweathermap.org/data/2.5/forecast?lat=" + str(latitude) + \
@@ -210,7 +209,7 @@ class Weather(QWidget):
             pix = pix.scaled(64, 64, Qt.AspectRatioMode.KeepAspectRatio)
             self.icons[i + 1].setPixmap(pix)
 
-        print("LOG: weather received")
+        print("API: weather received")
 
 
 # News Widget
@@ -239,7 +238,7 @@ class News(QWidget):
 
     # Gets and sets current news by Babylon Bee
     def getNews(self):
-        print("LOG: getting news")
+        print("API: getting news")
         try:
             # Parse XML
             rawNews = feedparser.parse("https://babylonbee.com/feed")
@@ -250,7 +249,7 @@ class News(QWidget):
             timer = QTimer(self)
             timer.timeout.connect(self.nextArticle)
             timer.start(10000)
-            print("LOG: news received")
+            print("API: news received")
         except Exception as e:
             print("ERROR " + str(e) + ". Issue with fetching news")
 
@@ -403,68 +402,76 @@ class Crypto(QWidget):
 
         self.setLayout(self.container)
 
-        # Update Crypto Data every
+        # Update Crypto Data every 5 minutes
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.getCryptoStuff)
-        self.timer.start(5000)
-
-        self.getCryptoStuff()
+        self.timer.start(300000)
 
     def getCryptoStuff(self):
-        crptoJsonURL = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=shiba-inu%2Cbitcoin%2Cethereum&order=gecko_desc&per_page=100&page=1&sparkline=false&price_change_percentage=1h%2C24h%2C7d"
+        print("API: getting crypto data")
+        # url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest'
 
-        cryptoData = json.loads(requests.get(crptoJsonURL).text)
+        # parameters = { 'slug': 'bitcoin,ethereum,shiba-inu', 'convert': 'USD' }
+        # headers = {
+        # 'Accepts': 'application/json',
+        # 'X-CMC_PRO_API_KEY': cryptoAPI,
+        # }
+        
+        # session = requests.Session()
+        # session.headers.update(headers)
 
-        for i in range(3):
-            self.prices[i].setText(
-                ("{:.2f}".format(cryptoData[i]["current_price"])).rstrip('0').rstrip('.'))
+        # cryptoData = json.loads(session.get(url, params=parameters).text)
+
+        #Dummy Data for Testing
+        cryptoData = {'status': {'timestamp': '2024-05-08T02:24:59.921Z', 'error_code': 0, 'error_message': None, 'elapsed': 46, 'credit_count': 1, 'notice': None}, 'data': {'1': {'id': 1, 'name': 'Bitcoin', 'symbol': 'BTC', 'slug': 'bitcoin', 'num_market_pairs': 11025, 'date_added': '2010-07-13T00:00:00.000Z', 'tags': ['mineable', 'pow', 'sha-256', 'store-of-value', 'state-channel', 'coinbase-ventures-portfolio', 'three-arrows-capital-portfolio', 'polychain-capital-portfolio', 'binance-labs-portfolio', 'blockchain-capital-portfolio', 'boostvc-portfolio', 'cms-holdings-portfolio', 'dcg-portfolio', 'dragonfly-capital-portfolio', 'electric-capital-portfolio', 'fabric-ventures-portfolio', 'framework-ventures-portfolio', 'galaxy-digital-portfolio', 'huobi-capital-portfolio', 'alameda-research-portfolio', 'a16z-portfolio', '1confirmation-portfolio', 'winklevoss-capital-portfolio', 'usv-portfolio', 'placeholder-ventures-portfolio', 'pantera-capital-portfolio', 'multicoin-capital-portfolio', 'paradigm-portfolio', 'bitcoin-ecosystem', 'ftx-bankruptcy-estate'], 'max_supply': 21000000, 'circulating_supply': 19695325, 'total_supply': 19695325, 'is_active': 1, 'infinite_supply': False, 'platform': None, 'cmc_rank': 1, 'is_fiat': 0, 'self_reported_circulating_supply': None, 'self_reported_market_cap': None, 'tvl_ratio': None, 'last_updated': '2024-05-08T02:24:00.000Z', 'quote': {'USD': {'price': 62742.46267781855, 'volume_24h': 25910254672.231747, 'volume_change_24h': -12.2546, 'percent_change_1h': 0.29687516, 'percent_change_24h': -1.61850602, 'percent_change_7d': 5.36664474, 'percent_change_30d': -9.45216392, 'percent_change_60d': -7.9191499, 'percent_change_90d': 40.58676603, 'market_cap': 1235733193740.0066, 'market_cap_dominance': 53.5561, 'fully_diluted_market_cap': 1317591716234.19, 'tvl': None, 'last_updated': '2024-05-08T02:24:00.000Z'}}}, '1027': {'id': 1027, 'name': 'Ethereum', 'symbol': 'ETH', 'slug': 'ethereum', 'num_market_pairs': 8900, 'date_added': '2015-08-07T00:00:00.000Z', 'tags': ['pos', 'smart-contracts', 'ethereum-ecosystem', 'coinbase-ventures-portfolio', 'three-arrows-capital-portfolio', 'polychain-capital-portfolio', 'binance-labs-portfolio', 'blockchain-capital-portfolio', 'boostvc-portfolio', 'cms-holdings-portfolio', 'dcg-portfolio', 'dragonfly-capital-portfolio', 'electric-capital-portfolio', 'fabric-ventures-portfolio', 'framework-ventures-portfolio', 'hashkey-capital-portfolio', 'kenetic-capital-portfolio', 'huobi-capital-portfolio', 'alameda-research-portfolio', 'a16z-portfolio', '1confirmation-portfolio', 'winklevoss-capital-portfolio', 'usv-portfolio', 'placeholder-ventures-portfolio', 'pantera-capital-portfolio', 'multicoin-capital-portfolio', 'paradigm-portfolio', 'injective-ecosystem', 'layer-1', 'ftx-bankruptcy-estate'], 'max_supply': None, 'circulating_supply': 120103321.12759581, 'total_supply': 120103321.12759581, 'is_active': 1, 'infinite_supply': True, 'platform': None, 'cmc_rank': 2, 'is_fiat': 0, 'self_reported_circulating_supply': None, 'self_reported_market_cap': None, 'tvl_ratio': None, 'last_updated': '2024-05-08T02:23:00.000Z', 'quote': {'USD': {'price': 3029.5986263570344, 'volume_24h': 11914695438.332094, 'volume_change_24h': -10.1295, 'percent_change_1h': 0.25721041, 'percent_change_24h': -1.997289, 'percent_change_7d': 1.83943281, 'percent_change_30d': -11.65717152, 'percent_change_60d': -22.57770018, 'percent_change_90d': 24.51184675, 'market_cap': 363864856709.08203, 'market_cap_dominance': 15.7779, 'fully_diluted_market_cap': 363864856709.08, 'tvl': None, 'last_updated': '2024-05-08T02:23:00.000Z'}}}, '5994': {'id': 5994, 'name': 'Shiba Inu', 'symbol': 'SHIB', 'slug': 'shiba-inu', 'num_market_pairs': 805, 'date_added': '2020-08-01T00:00:00.000Z', 'tags': ['memes', 'ethereum-ecosystem', 'doggone-doggerel'], 'max_supply': None, 'circulating_supply': 589289410812691, 'total_supply': 589534086491242.2, 'platform': {'id': 1027, 'name': 'Ethereum', 'symbol': 'ETH', 'slug': 'ethereum', 'token_address': '0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce'}, 'is_active': 1, 'infinite_supply': False, 'cmc_rank': 11, 'is_fiat': 0, 'self_reported_circulating_supply': None, 'self_reported_market_cap': None, 'tvl_ratio': None, 'last_updated': '2024-05-08T02:23:00.000Z', 'quote': {'USD': {'price': 2.3064574049514156e-05, 'volume_24h': 413871655.89457685, 'volume_change_24h': -28.7664, 'percent_change_1h': -0.22770932, 'percent_change_24h': -4.3326218, 'percent_change_7d': 6.24862726, 'percent_change_30d': -17.7332248, 'percent_change_60d': -34.92189397, 'percent_change_90d': 154.16718823, 'market_cap': 13591709252.28388, 'market_cap_dominance': 0.5893, 'fully_diluted_market_cap': 13597352592.59, 'tvl': None, 'last_updated': '2024-05-08T02:23:00.000Z'}}}}}
+        num = 0
+        for i in cryptoData["data"]:
+            self.prices[num].setText(
+                ("{:.2f}".format(cryptoData["data"][i]["quote"]["USD"]["price"])).rstrip('.'))
 
             hrChnge = ("{:.2f}".format(
-                cryptoData[i]["price_change_percentage_1h_in_currency"])).rstrip('0').rstrip('.')
-            if self.hourlyChange[i] != hrChnge + "%":
-                self.hourlyChange[i].setText(hrChnge + "%")
+                cryptoData["data"][i]["quote"]["USD"]["percent_change_1h"])).rstrip('.')
+            if self.hourlyChange[num] != hrChnge + "%":
+                self.hourlyChange[num].setText(hrChnge + "%")
                 if float(hrChnge) < 0:
-                    self.hourlyChange[i].setStyleSheet(
+                    self.hourlyChange[num].setStyleSheet(
                         "color: rgb(234, 57, 67);")
                 elif float(hrChnge) > 0:
-                    self.hourlyChange[i].setStyleSheet(
+                    self.hourlyChange[num].setStyleSheet(
                         "color: rgb(22, 199, 132);")
                 else:
-                    self.hourlyChange[i].setText("0%")
-                    self.hourlyChange[i].setStyleSheet("color: white;")
+                    self.hourlyChange[num].setText("0%")
+                    self.hourlyChange[num].setStyleSheet("color: white;")
 
             dayChnge = ("{:.2f}".format(
-                cryptoData[i]["price_change_percentage_24h_in_currency"])).rstrip('0').rstrip('.')
-            if self.dailyChange[i] != dayChnge + "%":
-                self.dailyChange[i].setText(dayChnge + "%")
+                cryptoData["data"][i]["quote"]["USD"]["percent_change_24h"])).rstrip('.')
+            if self.dailyChange[num] != dayChnge + "%":
+                self.dailyChange[num].setText(dayChnge + "%")
                 if float(dayChnge) < 0:
-                    self.dailyChange[i].setStyleSheet(
+                    self.dailyChange[num].setStyleSheet(
                         "color: rgb(234, 57, 67);")
                 elif float(dayChnge) > 0:
-                    self.dailyChange[i].setStyleSheet(
+                    self.dailyChange[num].setStyleSheet(
                         "color: rgb(22, 199, 132);")
                 else:
-                    self.dailyChange[i].setStyleSheet("color: white;")
+                    self.dailyChange[num].setStyleSheet("color: white;")
 
             weekChnge = ("{:.2f}".format(
-                cryptoData[i]["price_change_percentage_7d_in_currency"])).rstrip('0').rstrip('.')
-            if self.weeklyChange[i] != weekChnge + "%":
-                self.weeklyChange[i].setText(weekChnge + "%")
+                cryptoData["data"][i]["quote"]["USD"]["percent_change_7d"])).rstrip('.')
+            if self.weeklyChange[num] != weekChnge + "%":
+                self.weeklyChange[num].setText(weekChnge + "%")
                 if float(weekChnge) < 0:
-                    self.weeklyChange[i].setStyleSheet(
+                    self.weeklyChange[num].setStyleSheet(
                         "color: rgb(234, 57, 67);")
                 elif float(weekChnge) > 0:
-                    self.weeklyChange[i].setStyleSheet(
+                    self.weeklyChange[num].setStyleSheet(
                         "color: rgb(22, 199, 132);")
                 else:
-                    self.weeklyChange[i].setStyleSheet("color: white;")
-
-        self.prices[2].setText(
-            ("{:.12f}".format(cryptoData[2]["current_price"])).rstrip('0').rstrip('.'))
+                    self.weeklyChange[num].setStyleSheet("color: white;")
+            num += 1
+        print("API: crypto data recieved")
 
 # YouTube Widget
-
-
 class YouTube(QWidget):
     def __init__(self):
         super(YouTube, self).__init__()
@@ -562,59 +569,6 @@ class YTMenu(QWidget):
                 self.container.itemAt(i).layout().itemAt(
                     k).widget().deleteLater()
 
-
-# Todo list widget
-class TodoList(QWidget):
-    def __init__(self):
-        super(TodoList, self).__init__()
-        self.container = QVBoxLayout()
-        name = QLabel("Todoist")
-        name.setFont(font15)
-        self.container.addWidget(name)
-        self.api = TodoistAPI(todoistAPIKey)
-
-        self.updateTasks()
-
-        # Creates timer that calls updateTasks() every hour
-        self.checkTimer = QTimer(self)
-        self.checkTimer.timeout.connect(self.updateTasks)
-        self.checkTimer.start(3600000)
-        self.setLayout(self.container)
-
-    # Used to update tasks from the connected Todoist Account
-    def updateTasks(self):
-        print("LOG: getting tasks")
-        for i in reversed(range(1, self.container.count())):
-            for k in reversed(range(self.container.itemAt(i).layout().count())):
-                self.container.itemAt(i).layout().itemAt(
-                    k).widget().deleteLater()
-
-        try:
-            tasks = self.api.get_tasks()
-        except Exception as error:
-            print(error)
-
-        for i in range(len(tasks)):
-            hbox = QHBoxLayout()
-
-            try:
-                project = self.api.get_project(project_id=tasks[i].project_id)
-            except Exception as error:
-                print(error)
-
-            txt = QLabel(tasks[i].content)
-            txt.setFont(font15)
-            hbox.addWidget(txt)
-            txt = QLabel(project.name)
-            txt.setFont(font15)
-            hbox.addWidget(txt)
-            txt = QLabel(tasks[i].due.string)
-            txt.setFont(font15)
-            hbox.addWidget(txt)
-            self.container.addLayout(hbox)
-        print("LOG: tasks received")
-
-
 # MainWindow Widget
 # Contains all widgets with proper placement
 class MainWindow(QWidget):
@@ -644,7 +598,7 @@ class MainWindow(QWidget):
         self.news = News()
         self.news.setFixedHeight(100)
 
-        self.todo = TodoList()
+        self.todo = Crypto()
         self.todo.setFixedHeight(275)
         self.todo.setFixedWidth(350)
 
@@ -873,7 +827,7 @@ def getSpeech(q):
 def runServer():
     try:
         server = http.server.HTTPServer((HOST_NAME, PORT_NUMBER), MyHandler)
-        print("LOG: started HTTP server on port ", str(PORT_NUMBER))
+        print("LOG: started HTTP server on port", str(PORT_NUMBER))
 
         server.serve_forever()
 
