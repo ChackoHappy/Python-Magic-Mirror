@@ -31,8 +31,11 @@ longitude = -94.740486
 location = "Longview"
 weatherAPIKey = "e8daae205d7d385ea3588d79781c9327"
 
-#Coin Market Cap API
+# Coin Market Cap API
 cryptoAPI = '9883a0ee-d826-4d44-8728-e2e117927dc5'
+
+# Youtube Search API
+ytSearchKey = "AIzaSyD4RpZKISCw3lDWLd1NABVwc9_t5cQWxms"
 
 # Queue that will contain the commands recieved by the web server and the voice recognition service
 # Queue is used for data sharing between processes
@@ -598,10 +601,6 @@ class MainWindow(QWidget):
         self.news = News()
         self.news.setFixedHeight(100)
 
-        self.todo = Crypto()
-        self.todo.setFixedHeight(275)
-        self.todo.setFixedWidth(350)
-
         self.crypto = Crypto()
         self.crypto.setFixedHeight(275)
         self.crypto.setFixedWidth(625)
@@ -682,7 +681,7 @@ class MainWindow(QWidget):
                 query = q.get()
 
                 videoData = json.loads(requests.get(
-                    "https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=9&q=" + query + "&type=video&key=AIzaSyDQzpnQ3n0CGBxvlV0CWw35sk5Ok73Nfdk").text)
+                    "https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=9&q=" + query + "&type=video&key=" + ytSearchKey).text)
                 self.output = []
                 for i in range(9):
                     self.output.append(
